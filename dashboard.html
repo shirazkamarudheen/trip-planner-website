@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wanderlust | Premium Trip Planner</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300..700&family=Playfair+Display:ital,wght@0,400..800;1,400&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- App Container -->
+    <div class="app-container">
+      
+    <!-- HERO TEXT BACKDROP (Watermark) -->
+    <div class="hero-watermark" aria-hidden="true">WANDERLUST</div>
+
+    <!-- MAIN TOP BOOKING WIDGET (MMT Style) -->
+    <div class="top-widget-container">
+      <div class="booking-widget glass-panel">
+        
+        <!-- Top Tabs -->
+        <div class="bw-tabs transport-selector">
+          <button class="bw-tab transport-btn active" data-type="flight">
+             <span class="icon">✈️</span> Flights
+          </button>
+          <button class="bw-tab transport-btn" data-type="train">
+             <span class="icon">🚆</span> Trains
+          </button>
+          <button class="bw-tab transport-btn" data-type="bus">
+             <span class="icon">🚌</span> Buses
+          </button>
+          <!-- Keep currency selector sleek -->
+          <div class="bw-tab-right currency-toggle" style="margin-left: auto;">
+            <button class="curr-btn active" data-currency="INR">INR</button>
+            <button class="curr-btn" data-currency="USD">USD</button>
+            <button class="curr-btn" data-currency="EUR">EUR</button>
+          </div>
+        </div>
+
+        <form id="add-leg-form" class="bw-form">
+          <div class="bw-row">
+            
+            <!-- Focus on Budget First -->
+            <div class="bw-field budget-field">
+              <label for="total-budget">Total App Budget</label>
+              <div class="bw-input-wrap">
+                <span class="currency-symbol" id="main-currency">₹</span>
+                <input type="number" id="total-budget" class="large-input" placeholder="e.g 50000" />
+              </div>
+            </div>
+
+            <div class="bw-divider"></div>
+
+            <div class="bw-field">
+              <label for="leg-origin">Origin</label>
+              <input type="text" id="leg-origin" class="large-input" placeholder="New Delhi" required>
+            </div>
+
+            <div class="bw-divider"></div>
+
+            <div class="bw-field">
+              <label for="leg-dest">Destination</label>
+              <input type="text" id="leg-dest" class="large-input" placeholder="Goa" required>
+            </div>
+
+            <div class="bw-divider"></div>
+
+            <!-- Additional leg details compactly displayed -->
+            <div class="bw-field">
+              <label>Operator & Class</label>
+              <div class="bw-split-input">
+                <input type="text" id="leg-operator" placeholder="IndiGo" required>
+                <input type="text" id="leg-class" placeholder="Economy" required>
+              </div>
+            </div>
+
+            <div class="bw-divider"></div>
+
+            <div class="bw-field">
+              <label for="leg-cost">Cost & Duration</label>
+               <div class="bw-split-input">
+                <div class="bw-input-wrap">
+                  <span class="currency-symbol dynamic-curr">₹</span>
+                  <input type="number" id="leg-cost" placeholder="2500" required>
+                </div>
+                <input type="text" id="leg-duration" placeholder="2h 15m" required>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- The Floating Search/Add Pill Button -->
+          <button type="submit" class="bw-submit-btn hover-glitch">
+             <span class="glitch-text" data-text="APPEND SEGMENT">APPEND SEGMENT</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- App Container -->
+    <div class="app-container">
+
+      <!-- Left Sidebar: Controls -->
+      <aside class="sidebar">
+        <header class="sidebar-header">
+          <h1>Trip Dashboard</h1>
+          <p>Real-time aesthetic routing</p>
+        </header>
+
+        <section class="budget-status-card card">
+          <h3>Budget Overview</h3>
+          <div class="budget-progress-container">
+            <div class="budget-progress-bar" id="budget-progress-bar"></div>
+          </div>
+          <div class="budget-status" id="budget-status">
+            <span>₹0 spent</span>
+            <span>₹0 remaining</span>
+          </div>
+        </section>
+        
+        <section class="quick-routes-section card">
+          <h3>Popular Routes & Fares</h3>
+          <p class="subtitle">Click to auto-fill</p>
+          <div class="quick-routes-filter">
+             <button class="filter-btn active" data-filter="flight">Flights</button>
+             <button class="filter-btn" data-filter="train">Trains</button>
+             <button class="filter-btn" data-filter="bus">Buses</button>
+          </div>
+          <div class="quick-routes-list" id="quick-routes-list">
+            <!-- Populated via data.js -->
+          </div>
+        </section>
+
+      </aside>
+
+      <!-- Main Content: Dashboard -->
+      <main class="dashboard">
+        
+        <!-- Top Metrics Cards -->
+        <section class="metrics-grid">
+          <div class="metric-card">
+            <h4>Total Segments</h4>
+            <div class="metric-value" id="metric-segments">0</div>
+          </div>
+          <div class="metric-card">
+            <h4>Flights</h4>
+            <div class="metric-value" id="metric-flights">0</div>
+            <div class="metric-sub" id="metric-flights-cost">₹0</div>
+          </div>
+          <div class="metric-card">
+            <h4>Trains</h4>
+            <div class="metric-value" id="metric-trains">0</div>
+             <div class="metric-sub" id="metric-trains-cost">₹0</div>
+          </div>
+          <div class="metric-card">
+            <h4>Buses</h4>
+            <div class="metric-value" id="metric-buses">0</div>
+             <div class="metric-sub" id="metric-buses-cost">₹0</div>
+          </div>
+        </section>
+
+        <!-- Route Visualizer -->
+        <section class="visualizer-card card">
+           <h3>Trip Route</h3>
+           <div class="route-canvas" id="route-visualizer">
+              <div class="empty-state">No segments added yet. Add a leg to start mapping!</div>
+              <!-- Route nodes get injected here -->
+           </div>
+        </section>
+
+        <!-- Data Charts -->
+        <section class="charts-grid">
+           <div class="chart-card card">
+              <h3>Cost by Mode</h3>
+              <div class="chart-container">
+                 <canvas id="doughnut-chart"></canvas>
+              </div>
+           </div>
+           <div class="chart-card card">
+              <h3>Segment Costs</h3>
+              <div class="chart-container">
+                 <canvas id="bar-chart"></canvas>
+              </div>
+           </div>
+        </section>
+
+        <!-- Segments List -->
+        <section class="segments-card card">
+           <h3>Itinerary Breakdown</h3>
+           <div class="segments-list" id="segments-list">
+              <div class="empty-state">Add segments to see your itinerary.</div>
+           </div>
+        </section>
+
+      </main>
+
+    </div>
+    <script type="module" src="./data.js"></script>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
